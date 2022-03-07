@@ -1,4 +1,4 @@
-package com.github.jiangxch.mypring.test.service;
+package com.github.jiangxch.mypring.test.context.service;
 
 import com.github.jiangxch.mypring.config.annotation.Component;
 
