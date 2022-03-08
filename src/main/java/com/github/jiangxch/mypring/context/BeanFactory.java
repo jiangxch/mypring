@@ -6,9 +6,13 @@ import com.github.jiangxch.mypring.util.reflection.ReflectionUtil;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author: jiangxch
@@ -30,7 +34,31 @@ public class BeanFactory {
 
         populateProperties(beanDefinitions);
 
+        invokeBeanPostProcessor();
+
         clearEarlyObject(beanDefinitions);
+    }
+
+    private void invokeBeanPostProcessor() {
+        List<BeanPostProcessor> beanPostProcessors = getBeanPostProcessors(this.beanNameEarlyObjectMap.values());
+        for (Map.Entry<String, Object> beanNameObjMap : this.beanNameObjectMap.entrySet()) {
+            if (beanNameObjMap.getValue() instanceof BeanPostProcessor) {
+                continue;
+            }
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
+                beanPostProcessor.postProcessAfterInitialization(beanNameObjMap.getValue(), beanNameObjMap.getKey());
+            }
+        }
+    }
+
+    private List<BeanPostProcessor> getBeanPostProcessors(Collection<Object> objects) {
+        Set<BeanPostProcessor> res = new HashSet<>();
+        for (Object object : objects) {
+            if (object instanceof BeanPostProcessor) {
+                res.add((BeanPostProcessor) object);
+            }
+        }
+        return new ArrayList<>(res);
     }
 
     private void clearEarlyObject(List<BeanDefinition> beanDefinitions) {
@@ -77,7 +105,10 @@ public class BeanFactory {
                 List<Field> autowireFields = ReflectionUtil.findFiledByAnnotation(beanClass, Resource.class);
                 for (Field autowireField : autowireFields) {
                     String autowireBeanName = BeanDefinition.getBeanNameByClass(autowireField.getType());
-                    Object autowireBean = this.beanNameEarlyObjectMap.get(autowireBeanName);
+                    Object autowireBean = this.beanNameEarlyWrapObjectMap.get(autowireBeanName);
+                    if (autowireBean == null) {
+                        autowireBean = this.beanNameEarlyObjectMap.get(autowireBeanName);
+                    }
                     if (autowireBean == null) {
                         throw new RuntimeException("can't find bean with class=" + autowireField.getType().getName());
                     }
