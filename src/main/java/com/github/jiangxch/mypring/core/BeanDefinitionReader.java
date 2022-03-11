@@ -1,6 +1,5 @@
-package com.github.jiangxch.mypring.context;
+package com.github.jiangxch.mypring.core;
 
-import com.github.jiangxch.mypring.core.BeanDefinition;
 import com.github.jiangxch.mypring.config.annotation.Component;
 import com.github.jiangxch.mypring.config.annotation.ComponentScan;
 import com.github.jiangxch.mypring.util.ClassUtil;

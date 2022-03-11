@@ -1,4 +1,4 @@
-package com.github.jiangxch.mypring.context;
+package com.github.jiangxch.mypring.core;
 
 import com.github.jiangxch.mypring.util.ClassUtil;
 import com.github.jiangxch.mypring.util.io.FileUtil;
